@@ -46,3 +46,14 @@
   ![Prototype](./DesignPattern/prototype.png)
   >>prototype原型模式用于需要复制某个对象，即使对象所属的具体类未知的情况也能复制对象。原型对象可以生成自身的完整副本， 因为相同类的对象可以相互访问对方的私有成员变量.
   
+***********************************
+
+## 01/12/2020
+
++ Reading
+  > The "刻意练习" in wechat reading.
+
++ Thinking
+  > Singleton-Method(生成器模式模式)](https://refactoringguru.cn/design-patterns/singleton/cpp/example)
+  ![Singleton](./DesignPattern/singleton.png)
+  >>singleton原型模式让你能够保证一个类只有一个实例，并提供一个访问该实例的全局节点,实现一个粗糙的单例非常简单,你仅需隐藏构造函数并实现一个静态的构建方法即可;相同的类在多线程环境中会出错,多线程可能会同时调用构建方法并获取多个单例类的实例.
