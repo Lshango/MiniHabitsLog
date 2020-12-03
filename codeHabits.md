@@ -346,5 +346,51 @@
       return 0;
   }
   ```
+
 + Breaking
   > [linux可重入、异步信号安全和线程安全])(https://www.cnblogs.com/wuchanming/p/4020184.html)
+
+## 03/12/2020
+
++ Coding
+  > [Linux进程间通信-->signal](http://beej.us/guide/bgipc/html/single/bgipc.html#audience)
+
+  ```C++
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <unistd.h>
+    #include <signal.h>
+
+    void sigint_handler(int sig)
+    {
+        write(STDOUT_FILENO, "Ahhh! SIGINT!\n", 14);
+    }
+
+    int main(void)
+    {
+        // void sigint_handler(int sig); /* prototype */
+        char s[200];
+        struct sigaction sa;
+
+        sa.sa_handler = sigint_handler;
+        sa.sa_flags = SA_RESTART;//0; // or SA_RESTART
+        sigemptyset(&sa.sa_mask);
+
+        if (sigaction(SIGINT, &sa, NULL) == -1) {
+            perror("sigaction");
+            exit(1);
+        }
+
+        printf("Enter a string:\n");
+
+        if (fgets(s, sizeof(s), stdin) == NULL) {
+            perror("fgets");
+        } else {
+            printf("You entered: %s\n", s);
+        }
+        return 0;
+    }
+  ```
+
++ Breaking
+  > [learning git](https://learngitbranching.js.org/?locale=zh_CN)

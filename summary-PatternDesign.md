@@ -67,5 +67,15 @@
 + Thinking & Summary
   > [Adapter-Method(适配器模式)](https://refactoringguru.cn/design-patterns/adapter/cpp/example)
   ![Adapter-Object](./DesignPattern/structure-object-adapter.png)
+  >> Adapter适配器模式是一种结构型设计模式， 它能使接口不兼容的对象能够相互合作;可以用于对象接口的封装也可用与不同类之间的接口封装。软件使用中可以将接口或数据转换（统一外部接口，内部调用按照协议参数使用）代码从程序主要业务逻辑中分离.
+
+***********************************
+
+## 03/12/2020
+
++ Reading
+  > The "刻意练习" in wechat reading.
++ Thinking & Summary
+  > [Adapter-Method(适配器模式)](https://refactoringguru.cn/design-patterns/adapter/cpp/example)
   ![Adapter-Class](./DesignPattern/structure-class-adapter.png)
   >> Adapter适配器模式是一种结构型设计模式， 它能使接口不兼容的对象能够相互合作;可以用于对象接口的封装也可用与不同类之间的接口封装。软件使用中可以将接口或数据转换（统一外部接口，内部调用按照协议参数使用）代码从程序主要业务逻辑中分离.
