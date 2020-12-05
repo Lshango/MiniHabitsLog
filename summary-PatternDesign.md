@@ -86,3 +86,11 @@
 
 + Reading
   > The "刻意练习" in wechat reading.
+
+***********************************
+
+## 05/12/2020
+
++ Reading
+  > The "刻意练习" in wechat reading.
++ Thinking & Summary
