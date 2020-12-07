@@ -94,3 +94,13 @@
 + Reading
   > The "刻意练习" in wechat reading.
 + Thinking & Summary
+
+
+***********************************
+
+## 07/12/2020
+
++ Reading
+  > The "刻意练习 & More effective C++" in wechat reading.
++ Thinking & Summary
+  > 设计模式不能只看，需按照介绍写c++或者其他语言的版本.
