@@ -46,6 +46,10 @@ public:
 + Leetcode-->[Problem #2](https://leetcode.com/problems/add-two-numbers/)
 
 ```Python
+class ListNode:
+    def __init__(self, x):
+        self.val = x
+        self.next = None
 class Solution:
     def addTwoNumbers(self, l1: ListNode, l2: ListNode) -> ListNode:
         prev = r_val = ListNode(None)
@@ -68,6 +72,13 @@ class Solution:
 + Leetcode-->[Problem #2](https://leetcode.com/problems/add-two-numbers/)
 
 ```C++
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode() : val(0), next(nullptr) {}
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x, ListNode *next) : val(x), next(next) {}
+ };
 class Solution {
 public:
     ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
@@ -90,4 +101,86 @@ public:
         return result->next;
     }
 };
+```
+
+## 12/12/2020
+
++ Leetcode-->[Problem #3](https://leetcode.com/problems/longest-substring-without-repeating-characters/)
+
+```Python
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        subString = ""
+        retLongth = 0
+        for i in range(0, len(s)):
+            if s[i] in subString:
+                retLongth = max(retLongth, len(subString))
+                pos = subString.find(s[i])
+                subString = subString[(pos+1):] + s[i]
+            else:
+                subString += s[i]
+        
+        return max(retLongth, len(subString))
+```
+
+```C++
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        string subString{""};
+        int retLength{0};
+        for (const auto& c : s){
+            if(subString.find(c) != string::npos){
+                retLength = (retLength > subString.size() ? retLength : subString.size());
+                subString = subString.substr(subString.find(c) + 1);
+            }
+            subString += c;
+        }
+        retLength = (retLength > subString.size() ? retLength : subString.size());
+        return retLength;
+    }
+};
+```
+
+## 13/12/2020
+
++ Leetcode-->[Problem #4](https://leetcode-cn.com/problems/median-of-two-sorted-arrays/)
+
+```Python
+class Pro004Solution:
+    @classmethod
+    def find_median_sorted_arrays(cls, nums1, nums2):
+        """
+        :param nums1: list[int]
+        :param nums2: list[int]
+        :return: float
+        """
+        def get_kth_smallest(a_start, b_start, k):
+            if k <= 0 or k > len(nums1) - a_start + len(nums2) - b_start:
+                raise ValueError("The input value error!")
+            if len(nums1) == a_start:
+                return nums2[b_start + k - 1]
+            if len(nums2) == b_start:
+                return nums1[a_start + k - 1]
+            if k == 1:
+                return min(nums1[a_start], nums2[b_start])
+
+            mid_a, mid_b = float('inf'), float('inf')
+            if k//2 <= len(nums1) - a_start:
+                mid_a = nums1[a_start + k // 2 - 1]
+            if k//2 <= len(nums2) - b_start:
+                mid_b = nums2[b_start + k // 2 - 1]
+
+            if mid_a < mid_b:
+                return get_kth_smallest(a_start + k // 2, b_start, k - k // 2)
+            else:
+                return get_kth_smallest(a_start, b_start + k // 2, k - k // 2)
+
+        right = get_kth_smallest(0, 0, 1 + (len(nums1) + len(nums2))//2)
+        if (len(nums1) + len(nums2)) % 2 == 1:
+            return right
+        else:
+            left = get_kth_smallest(0, 0, (len(nums1) + len(nums2))//2)
+            return (left + right)/2.0
+
 ```
