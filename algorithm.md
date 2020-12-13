@@ -141,6 +141,7 @@ public:
     }
 };
 ```
+<<<<<<< HEAD
 
 ## 13/12/2020
 
@@ -184,3 +185,5 @@ class Pro004Solution:
             return (left + right)/2.0
 
 ```
+=======
+>>>>>>> 3260c62636e57f6aabe5ae2e65bc10e9bacf44c3
