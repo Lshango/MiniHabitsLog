@@ -44,7 +44,7 @@
   >>
   > cgdb 更强大的工具
 
-***********************************
+* * *
 
 ## 29/11/2020
 
@@ -89,7 +89,7 @@
   >
   > [在Linux中，编写入门的makefile文件](https://blog.csdn.net/qq_33154343/article/details/104758512)
 
-***********************************
+* * *
 
 ## 30/11/2020
 
@@ -133,7 +133,7 @@
   > [git stash](https://www.cnblogs.com/tocy/p/git-stash-reference.html)
   very useful, means save current status and try to process other emergency things.
 
-***********************************
+* * *
 
 ## 01/12/2020
 
@@ -244,7 +244,7 @@
   $ ls . &> list
   ```
 
-***********************************
+* * *
 
 ## 02/12/2020
 
@@ -350,7 +350,8 @@
 + Breaking
   > [linux可重入、异步信号安全和线程安全])(https://www.cnblogs.com/wuchanming/p/4020184.html)
 
-***********************************
+* * *
+
 ## 03/12/2020
 
 + Coding
@@ -396,7 +397,7 @@
 + Breaking
   > [learning git](https://learngitbranching.js.org/?locale=zh_CN)
 
-***********************************
+* * *
 
 ## 04/12/2020
 
@@ -441,7 +442,7 @@
   > [learning git](https://learngitbranching.js.org/?locale=zh_CN)
   >> git branch/commit/checkout/cherry-pick/merge/rebase/fetch/pull/push
 
-***********************************
+* * *
 
 ## 05/12/2020
 
@@ -500,7 +501,7 @@
   > C++ stream
   >> ![c++ stream](./Image/iostream.gif)
 
-***********************************
+* * *
 
 ## 07/12/2020
 
@@ -668,7 +669,7 @@
 
     #define SHM_SIZE 1024  /* make it a 1K shared memory segment */
 
-    int main(int argc, char *argv[])
+    int main(int argc, char *argv[])   
     {
         key_t key;
         int shmid;
@@ -716,6 +717,62 @@
             perror("shmdt");
             exit(1);
         }
+
+        return 0;
+    }
+    ```
+
+* * *
+
+## 18/12/2020
+
++ Coding
+    > [Linux进程间通信-->Memory Mapped File](http://beej.us/guide/bgipc/html/single/bgipc.html#audience)
+
+    ```C++
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <fcntl.h>
+    #include <unistd.h>
+    #include <sys/types.h>
+    #include <sys/mman.h>
+    #include <sys/stat.h>
+    #include <errno.h>
+
+    int main(int argc, char *argv[])    
+    {
+        int fd, offset;
+        char *data;
+        struct stat sbuf;
+
+        if (argc != 2) {
+            fprintf(stderr, "usage: mmapdemo offset\n");
+            exit(1);
+        }
+
+        if ((fd = open("mmapdemo.cpp", O_RDONLY)) == -1) {
+            perror("open");
+            exit(1);
+        }
+
+        if (stat("mmapdemo.cpp", &sbuf) == -1) {
+            perror("stat");
+            exit(1);
+        }
+
+        offset = atoi(argv[1]);
+        if (offset < 0 || offset > sbuf.st_size-1) {
+            fprintf(stderr, "mmapdemo: offset must be in the range 0-%d\n", sbuf.st_size-1);
+            exit(1);
+        }
+        
+        data = (char *)mmap((caddr_t)0, sbuf.st_size, PROT_READ, MAP_SHARED, fd, 0);
+        if (data == (caddr_t)(-1)) {
+            perror("mmap");
+            exit(1);
+        }
+
+        printf("byte at offset %d is '%c'\n", offset, data[offset]);
 
         return 0;
     }
