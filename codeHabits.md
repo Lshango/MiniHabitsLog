@@ -793,6 +793,7 @@
     #include <sys/types.h>
     #include <sys/socket.h>
     #include <sys/un.h>
+    #include <unistd.h>
 
     #define SOCK_PATH "echo_socket"
 
@@ -825,7 +826,7 @@
             int done, n;
             printf("Waiting for a connection...\n");
             t = sizeof(remote);
-            if ((s2 = accept(s, (struct sockaddr *)&remote, &t)) == -1) {
+            if ((s2 = accept(s, (struct sockaddr *)&remote, (socklen_t*)(&t))) == -1) {
                 perror("accept");
                 exit(1);
             }
@@ -840,6 +841,8 @@
                     done = 1;
                 }
 
+                printf("receive from client> %s", str);
+
                 if (!done) 
                     if (send(s2, str, n, 0) < 0) {
                         perror("send");
@@ -852,4 +855,100 @@
 
         return 0;
     }
+    ```
+
+* * *
+
+## 20/12/2020
+
++ Coding
+    > [Linux进程间通信-->Sockets in Client](http://beej.us/guide/bgipc/html/single/bgipc.html#audience)
+
+    ```C++
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <errno.h>
+    #include <string.h>
+    #include <sys/types.h>
+    #include <sys/socket.h>
+    #include <sys/un.h>
+    #include <unistd.h>
+
+    #define SOCK_PATH "echo_socket"
+
+    int main(void)
+    {
+        int s, t, len;
+        struct sockaddr_un remote;
+        char str[100];
+
+        if ((s = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
+            perror("socket");
+            exit(1);
+        }
+
+        printf("Trying to connect...\n");
+
+        remote.sun_family = AF_UNIX;
+        strcpy(remote.sun_path, SOCK_PATH);
+        len = strlen(remote.sun_path) + sizeof(remote.sun_family);
+        if (connect(s, (struct sockaddr *)&remote, len) == -1) {
+            perror("connect");
+            exit(1);
+        }
+
+        printf("Connected.\n");
+
+        while(printf("> "), fgets(str, 100, stdin), !feof(stdin)) {
+            if (send(s, str, strlen(str), 0) == -1) {
+                perror("send");
+                exit(1);
+            }
+
+            if ((t=recv(s, str, 100, 0)) > 0) {
+                str[t] = '\0';
+                printf("server send back> %s", str);
+            } else {
+                if (t < 0) perror("recv");
+                else printf("Server closed connection\n");
+                exit(1);
+            }
+        }
+
+        close(s);
+
+        return 0;
+    }
+    ```
+
++ Breaking
+    > [An Introduction to GCC](https://www.linuxtopia.org/online_books/an_introduction_to_gcc/index.html)
+
+    ```C++
+    #include <stdio.h>
+    int main (void)
+    {
+        #ifdef TEST
+            printf ("Test mode\n");
+        #endif
+        printf ("Running...\n");
+        return 0;
+    }
+    ```
+
+    The gcc option -DNAME defines a preprocessor macro NAME from the command line. If the program above is compiled with the command-line option -DTEST, the macro TEST will be defined and the resulting executable will print both messages:
+
+    ```sh
+    $ gcc -Wall -DTEST dtest.c
+    $ ./a.out
+    Test mode
+    Running...
+    ```
+
+    If the same program is compiled without the -D option then the "Test mode" message is omitted from the source code after preprocessing, and the final executable does not include the code for it:
+
+    ```sh
+    $ gcc -Wall dtest.c
+    $ ./a.out
+    Running...
     ```
