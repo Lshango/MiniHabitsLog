@@ -68,12 +68,17 @@
 
 ## 24/12/2020
 
+<<<<<<< HEAD
 + Thinking & Summary [Factory-Method Applicability](https://www.oodesign.com/factory-pattern.html)
   > 实现方法1：单个工厂类，按照传递的参数不同生成不同的产品;
 
   > 实现方法2：单个工厂类，增加注册列表，将参数与产品对应起来，时方法1的改进版，不需要每次都修改工厂类；
 
   > 实现方法3：工厂类派生，不同的工厂派生类产生不同的产品；
+=======
++ Thinking & Summary
+  > 设计模式不能只看，需按照介绍写c++或者其他语言的版本.
+>>>>>>> ff8264d7884d04dadeb06893f008cbbda652536e
 + Example of Factory-Method(工厂方法模式)
   
   ```C++
