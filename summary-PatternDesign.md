@@ -70,12 +70,131 @@
 
 + Thinking & Summary [Factory-Method Applicability](https://www.oodesign.com/factory-pattern.html)
   > 实现方法1：单个工厂类，按照传递的参数不同生成不同的产品;
+  
+  ```C++
+  unique_ptr<IType> create(name) {
+    if (name == "Abc") return make_unique<AbcType>();
+    if (name == "Xyz") return make_unique<XyzType>();
+    if (...) return ...
+
+    return nullptr;
+  }
+  ```
 
   > 实现方法2：单个工厂类，增加注册列表，将参数与产品对应起来，时方法1的改进版，不需要每次都修改工厂类；
+  [self-register-factory](https://github.com/qicosmos/cosmos/tree/master/self-register-factory)
+  
+  ```C++
+  #include <map>
+  #include <string>
+  #include <functional>
+  #include <memory>
+  #include <iostream>
 
+  class Message{
+  public:
+      virtual ~Message() {}
+      virtual void foo() {}
+  };
+  
+  class Message1 : public Message{
+  public:
+      Message1() {
+          std::cout << "message1" << std::endl;
+      }
+  
+      Message1(int a)  {
+          std::cout << "message1 int: " << a << std::endl;
+      }
+  
+      ~Message1(){}
+  
+      void foo() override {
+          std::cout << "message1" << std::endl;
+      }
+  };
+
+  class Message2 : public Message{
+  public:
+      Message2() {
+          std::cout << "message2" << std::endl;
+      }
+      Message2(int a)  {
+          std::cout << "message2 int: " << a << std::endl;
+      }
+  
+      ~Message2(){}
+  
+      void foo() override {
+          std::cout << "message2" << std::endl;
+      }
+  };
+  
+  
+  class factory{
+  public:
+      template<typename T>
+      struct register_t  {
+          register_t(const std::string& key) {
+              factory::get().map_.emplace(key, [] { return new T(); });
+          }
+  
+  
+          template<typename... Args>
+          register_t(const std::string& key, Args... args)  {
+              factory::get().map_.emplace(key, [&] { return new T(args...); });
+          }
+      };
+  
+      static Message* produce(const std::string& key) {
+          if (map_.find(key) == map_.end())
+              throw std::invalid_argument("the message key is not exist!"); 
+          return map_[key]();
+      }
+  
+  
+      static std::unique_ptr<Message> produce_unique(const std::string& key) {
+          return std::unique_ptr<Message>(produce(key));
+      }
+  
+  
+      static std::shared_ptr<Message> produce_shared(const std::string& key) {
+          return std::shared_ptr<Message>(produce(key));
+      }
+  
+  private:
+      factory() {};
+      factory(const factory&) = delete;
+      factory(factory&&) = delete;
+  
+      static factory& get() {
+          static factory instance;
+          return instance;
+      }
+  
+      static std::map<std::string, std::function<Message*()>> map_;
+  };
+  
+  std::map<std::string, std::function<Message*()>> factory::map_;
+  #define REGISTER_MESSAGE_VNAME(T) reg_msg_##T##_
+  #define REGISTER_MESSAGE(T, key, ...) static factory::register_t<T> REGISTER_MESSAGE_VNAME(T)(key, ##__VA_ARGS__);
+
+
+  REGISTER_MESSAGE(Message1, "message1", 2);//this should move to the message class if there are multiple file;
+  REGISTER_MESSAGE(Message2, "message2"); 
+
+  int main()
+  {
+      Message* p = factory::produce("message1");
+      p->foo();   //Message1 
+  
+      delete p;  
+      auto p2 = factory::produce_unique("message2");
+      p2->foo();
+  }
+  ```
+  
   > 实现方法3：工厂类派生，不同的工厂派生类产生不同的产品；
-
-+ Example of Factory-Method(工厂方法模式)
   
   ```C++
   /**
