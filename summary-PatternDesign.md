@@ -69,6 +69,7 @@
 ## 24/12/2020
 
 + Thinking & Summary [Factory-Method Applicability](https://www.oodesign.com/factory-pattern.html)
++ [Example](https://www.icode9.com/content-1-745035.html)
   > 实现方法1：单个工厂类，按照传递的参数不同生成不同的产品;
   
   ```C++
@@ -81,7 +82,13 @@
   }
   ```
 
-  > 实现方法2：单个工厂类，增加注册列表，将参数与产品对应起来，时方法1的改进版，不需要每次都修改工厂类；
+  > 实现方法2：单个工厂类，工厂方法模式，是方法1的改进版，不需要每次都修改工厂类；
+  
+  ```C++
+  sudo dpkg -i package_file.deb
+  ```
+
+  > 实现方法3：单个工厂类，增加注册列表，将参数与产品对应起来，是方法1的改进版，不需要每次都修改工厂类；
   [self-register-factory](https://github.com/qicosmos/cosmos/tree/master/self-register-factory)
   
   ```C++
@@ -142,7 +149,8 @@
   
           template<typename... Args>
           register_t(const std::string& key, Args... args)  {
-              factory::get().map_.emplace(key, [&] { return new T(args...); });
+              //factory::get().map_.emplace(key, [&] { return new T(args...); });
+            factory::get().map_.emplace(key, [args...] { return new T(args...); });
           }
       };
   
@@ -176,15 +184,15 @@
   };
   
   std::map<std::string, std::function<Message*()>> factory::map_;
-  #define REGISTER_MESSAGE_VNAME(T) reg_msg_##T##_
-  #define REGISTER_MESSAGE(T, key, ...) static factory::register_t<T> REGISTER_MESSAGE_VNAME(T)(key, ##__VA_ARGS__);
+  //#define REGISTER_MESSAGE_VNAME(T) reg_msg_##T##_
+  // #define REGISTER_MESSAGE(T, key, ...) static factory::register_t<T> REGISTER_MESSAGE_VNAME(T)(key, ##__VA_ARGS__)
+  #define REGISTER_MESSAGE(T, key, ...) static factory::register_t<T> reg_msg_##T##_(key, ##__VA_ARGS__);
 
 
   REGISTER_MESSAGE(Message1, "message1", 2);//this should move to the message class if there are multiple file;
   REGISTER_MESSAGE(Message2, "message2"); 
 
-  int main()
-  {
+  int main()  {
       Message* p = factory::produce("message1");
       p->foo();   //Message1 
   
@@ -194,7 +202,7 @@
   }
   ```
   
-  > 实现方法3：工厂类派生，不同的工厂派生类产生不同的产品；
+  > 实现方法4：工厂类派生，不同的工厂派生类产生不同的产品；
   
   ```C++
   /**
