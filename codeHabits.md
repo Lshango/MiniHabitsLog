@@ -1066,7 +1066,7 @@
 ## 29/12/2020
 
 + Coding
-    > [Linux-->Multiple thread](https://xmuli.blog.csdn.net/article/details/105546234)
+    > [Linux-->Multiple threads by pthread](https://xmuli.blog.csdn.net/article/details/105546234)
 
     ```C++
     #include <stdio.h>
@@ -1075,8 +1075,7 @@
 
     void* myfun(void* arg);
 
-    int main(int argc, char *argv[])
-    {
+    int main(int argc, char *argv[])  {
         pthread_t pthread = 0;  //创建一个子线程
         int ret = pthread_create(&pthread, NULL, myfun, NULL);
         printf("parent thread id: %ld\n", pthread_self);
@@ -1095,4 +1094,42 @@
         return NULL;
     }
     //g++ multiThds.cpp -o multiThds -lpthread
+    ```
+
+* * *
+
+## 30/12/2020
+
++ Coding
+    > [Linux-->multiple thread by std in C++11]
+
+    ```C++
+    #include <iostream>
+    #include <vector>
+    #include <thread>
+
+    void printThreadIDs(int &val1, int val2){
+        std::cout << "Thread ID: " << std::this_thread::get_id() << " Val 1: " << val1++ << " val2: " << val2++ << std::endl;
+    }
+    int main(int argc, char** argv){
+        int val1 = 9;
+        int val2 = 9;
+        
+        std::vector <std::thread> threads;
+        
+        for(int i = 0; i < 4; i++){
+            std::thread t(printThreadIDs, std::ref(val1), val2);
+            threads.push_back(std::move(t)); // Instead of copying, move t into the vector (Less expensive)
+        }
+
+        // Now wait for the threads to finish,
+        // We need to wait otherwise main thread might reach an end before the multiple threads finish their work
+        for(auto &t: threads){
+            t.join();
+        }
+
+        std::cout << "Final value of variable val1: " << val1 << " val2: " << val2 << std::endl;
+        return 0;
+    }
+    //g++ multiThreads.cpp -o multiThreads -pthread
     ```
