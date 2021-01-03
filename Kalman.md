@@ -626,3 +626,60 @@ This notation, copied from [Wikipedia](https://en.wikipedia.org/wiki/Kalman_filt
 The **Symbology** Appendix lists the notation used by various authors. This brings up another difficulty. Different authors use different variable names. $\mathbf x$ is fairly universal, but after that it is anybody's guess. For example, it is common to use $\mathbf{A}$ for what I call $\mathbf F$. You must read carefully, and hope that the author defines their variables (they often do not).
 
 If you are a programmer trying to understand a paper's equations, I suggest starting by removing all of the superscripts, subscripts, and diacriticals, replacing them with a single letter. If you work with equations like this every day this is superfluous advice, but when I read I am usually trying to understand the flow of computation. To me it is far more understandable to remember that $P$ in this step represents the updated value of $P$ computed in the last step, as opposed to trying to remember what $P_{k-1}(+)$ denotes, and what its relation to $P_k(-)$ is, if any, and how any of that relates to the completely different notation used in the paper I read 5 minutes ago.
+
+### How Velocity is Calculated
+
+I haven't explained how the filter computes the velocity, or any hidden variable. If we plug in the values we calculated for each of the filter's matrices we can see what happens.
+
+First we need to compute the system uncertainty.
+
+$$\begin{aligned}
+\textbf{S} &= \mathbf{H\bar PH}^\mathsf T + \mathbf R \\
+&= \begin{bmatrix} 1 & 0\end{bmatrix}
+\begin{bmatrix}\sigma^2_x & \sigma_{xv} \\ \sigma_{xv} & \sigma^2_v\end{bmatrix}
+\begin{bmatrix} 1 \\ 0\end{bmatrix} + \begin{bmatrix}\sigma_z^2\end{bmatrix}\\
+&= \begin{bmatrix}\sigma_x^2 & \sigma_{xv}\end{bmatrix}\begin{bmatrix} 1 \\ 0\end{bmatrix}+ \begin{bmatrix}\sigma_z^2\end{bmatrix} \\
+&= \begin{bmatrix}\sigma_x^2 +\sigma_z^2\end{bmatrix}
+\end{aligned}$$
+
+Now that we have $\mathbf S$ we can find the value for the Kalman gain:
+$$\begin{aligned}
+\mathbf K &= \mathbf{\bar PH}^\mathsf T \mathbf{S}^{-1} \\
+&= \begin{bmatrix}\sigma^2_x & \sigma_{xv} \\ \sigma_{xv} & \sigma^2_v\end{bmatrix}
+\begin{bmatrix} 1 \\ 0\end{bmatrix}
+\begin{bmatrix}\frac{1}{\sigma_x^2 +\sigma_z^2}\end{bmatrix} \\
+&= \begin{bmatrix}\sigma^2_x  \\ \sigma_{xv}\end{bmatrix}
+\begin{bmatrix}\frac{1}{\sigma_x^2 +\sigma_z^2}\end{bmatrix} \\
+&= \begin{bmatrix}\sigma^2_x/(\sigma_x^2 +\sigma_z^2)  \\ \sigma_{xv}/(\sigma_x^2 +\sigma_z^2)\end{bmatrix}
+\end{aligned}
+$$
+
+In other words, the Kalman gain for $x$ is
+
+$$K_x = \frac{VAR(x)}{VAR(x)+VAR(z)}$$
+
+This should be very familiar to you from the univariate case.
+
+The Kalman gain for the velocity $\dot x$ is
+$$K_{\dot x} = \frac{COV(x, \dot x)}{VAR(x)+VAR(z)}$$
+
+What is the effect of this? Recall that we compute the state as
+
+$$\begin{aligned}\mathbf x 
+&=\mathbf{\bar x}+\mathbf K(z-\mathbf{Hx)} \\
+&= \mathbf{\bar x}+\mathbf Ky\end{aligned}$$
+
+Here the residual $y$ is a scalar. Therefore it is multiplied into each element of $\mathbf K$. Therefore we have
+
+$$\begin{bmatrix}x \\ \dot x\end{bmatrix}=\begin{bmatrix}\bar x \\ \bar{\dot x}\end{bmatrix} + \begin{bmatrix}K_x \\ K_{\dot x}\end{bmatrix}y$$
+
+Which gives this system of equations:
+
+$$\begin{aligned}x& = \bar x + yK_x\\
+\dot x &= \bar{\dot x} + yK_{\dot x}\end{aligned}$$
+
+The prediction $\bar x$ was computed as $x + \bar x \Delta t$. If the prediction was perfect then the residual will be $y=0$ (ignoring noise in the measurement) and the velocity estimate will be unchanged. On the other hand, if the velocity estimate was very bad then the prediction will be very bad, and the residual will be large: $y >> 0$. In this case we update the velocity estimate with $yK_{\dot x}$. $K_{\dot x}$ is proportional to $COV(x,\dot x)$. Therefore the velocity is updated by the error in the position times the value proportional to the covariance between the position and velocity. The higher the correlation the larger the correction.
+
+To bring this full circle, $COV(x,\dot x)$ are the off-diagonal elements of $\mathbf P$. Recall that those values were computed with $\mathbf{FPF}^\mathsf T$. So the covariance of position and velocity is computed during the predict step. The Kalman gain for the velocity is proportional to this covariance, and we adjust the velocity estimate based on how inaccurate it was during the last epoch times a value proportional to this covariance.
+
+In summary, these linear algebra equations may be unfamiliar to you, but computation is actually very simple. It is essentially the same computation that we performed in the g-h filter. Our constants are different in this chapter because we take the noise in the process model and sensors into account, but the math is the same.
