@@ -16,3 +16,5 @@
 7. [Machine Learning CS229](http://cs229.stanford.edu/syllabus-fall2020.html)
 8. [Learning C++](https://www.tutorialspoint.com/cplusplus/cpp_web_programming.htm)
 9. [Operating Systems: Three Easy Pieces](http://pages.cs.wisc.edu/~remzi/OSTEP/)
+10.
+
