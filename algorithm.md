@@ -215,6 +215,6 @@ class Pro004Solution:
             else
                 return A[ia - 1];
         }
-    };
+    }; 
   ```
   
